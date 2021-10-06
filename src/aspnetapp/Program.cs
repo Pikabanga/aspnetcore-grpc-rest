@@ -14,7 +14,7 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddControllers();
@@ -35,7 +35,7 @@ builder.Services.AddVersionedApiExplorer(options =>
     //NOTE: the specified format code will format the version as "'v'major[.minor][-status]"
     options.GroupNameFormat = "'v'VVV";
 
-    //NOTE: this option is only necessary when versioning by url segment.
+    //NOTE: this option is only necessary when versioning by url segment
     options.SubstituteApiVersionInUrl = true;
 });
 
@@ -61,7 +61,7 @@ builder.Services.AddSwaggerGen(options =>
 
     options.DescribeAllParametersInCamelCase();
 
-    // Set the comments path for the Swagger JSON and UI.
+    // Set the comments path for the Swagger JSON and UI
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath);
@@ -79,32 +79,25 @@ builder.WebHost.UseKestrel(options =>
     var services = options.ApplicationServices;
 
     // Use HTTP/1.x
-    options.ListenAnyIP(4999,
-        listenOptions =>
-            listenOptions.Protocols = HttpProtocols.Http1);
+    options.ListenAnyIP(4999, listenOptions =>
+        listenOptions.Protocols = HttpProtocols.Http1);
 
     // Use HTTP/2
-    options.ListenAnyIP(
-        5000,
-        listenOptions =>
-            listenOptions.Protocols = HttpProtocols.Http2);
+    options.ListenAnyIP(5000, listenOptions =>
+        listenOptions.Protocols = HttpProtocols.Http2);
 
-
-    // options.ListenAnyIP(
-    //     5001,
-    //     listenOptions =>
-    //     {
-    //         // Enables HTTP/3
-    //         listenOptions.Protocols = HttpProtocols.Http3;
+    //This requires a platform that support QUIC or HTTP/3.
+    // options.ListenAnyIP(5001, listenOptions =>
+    // {
+    //     // Enables HTTP/3
+    //     listenOptions.Protocols = HttpProtocols.Http3;
     //
-    //         // Adds a TLS certificate to the endpoint
-    //         listenOptions.UseHttps(httpsOptions =>
-    //         {
-    //             httpsOptions.UseLettuceEncrypt(services);
-    //         });
-    //     });
-});
-//.ConfigureServices(services => services.AddLettuceEncrypt());
+    //     // Adds a TLS certificate to the endpoint
+    //     listenOptions.UseHttps(httpsOptions =>
+    //         httpsOptions.UseLettuceEncrypt(services));
+    // });
+})
+.ConfigureServices(services => services.AddLettuceEncrypt());
 
 await using var app = builder.Build();
 
@@ -122,10 +115,10 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = string.Empty; // Serve the Swagger UI at the app's root
 });
 
-// Matches request to an endpoint.
+// Matches request to an endpoint
 app.UseRouting();
 
-// Execute the matched endpoint.
+// Execute the matched endpoint
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
