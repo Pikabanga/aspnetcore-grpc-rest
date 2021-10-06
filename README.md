@@ -1,6 +1,6 @@
-# Hybrid RESTful and gRPC service using ASP.NET Core 5.0
+# Hybrid RESTful and gRPC service using ASP.NET Core 6.0
 
-This document outlines how to get started with a hybrid REST and gRPC service using ASP.NET Core 5.0.
+This document outlines how to get started with a hybrid REST and gRPC service using ASP.NET Core 6.0.
 
 ## Motivation
 
@@ -12,7 +12,7 @@ You can import the code straight into your preferred IDE (i.e. Visual Studio) or
 
 ```pwsh
 >  dotnet build
->  dotnet .\aspnetapp\bin\Debug\net5.0\aspnetapp.dll
+>  dotnet .\aspnetapp\bin\Debug\net6.0\aspnetapp.dll
 ```
 
 After the application runs, navigate to http://localhost:4999/swagger in your web browser to access the Swagger UI. Enter a value in the name field and it should return something similar like this below:

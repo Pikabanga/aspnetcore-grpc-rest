@@ -1,48 +1,134 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using aspnetapp.Services;
+using Greet.V1;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 
-namespace aspnetapp
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddControllers();
+
+builder.Services.AddRouting(options => 
+    options.LowercaseUrls = true);
+
+//Add API versioning to application
+builder.Services.AddApiVersioning(options =>
 {
-    /// <summary>
-    /// Program class
-    /// </summary>
-    public class Program
+    //Reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+});
+
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    //NOTE: the specified format code will format the version as "'v'major[.minor][-status]"
+    options.GroupNameFormat = "'v'VVV";
+
+    //NOTE: this option is only necessary when versioning by url segment.
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
     {
-        /// <summary>
-        /// The entry point of the application
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        private static async Task Main(string[] args) =>
-            await CreateHostBuilder(args).Build().RunAsync();
+        Version = "v1",
+        Title = "Sample API",
+        Description = "A simple hybrid REST and gRPC service using ASP.NET Core 6.0",
+        Contact = new OpenApiContact
+        {
+            Name = "Ben Chen",
+            Url = new Uri("https://linkedin.com/in/bchen04/")
+        },
+        License = new OpenApiLicense
+        { 
+            Name = "MIT License",
+            Url = new Uri("https://github.com/bchen04/aspnetcore-grpc-rest/blob/main/LICENSE")
+        }
+    });
+
+    options.DescribeAllParametersInCamelCase();
+
+    // Set the comments path for the Swagger JSON and UI.
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+
+});
+
+// Registers the service with a scoped lifetime
+builder.Services.AddScoped<IGreeterService, GreeterService>();
+
+builder.Services.AddGrpc();
+
+builder.WebHost.UseKestrel(options =>
+{
+    var services = options.ApplicationServices;
+
+    // Use HTTP/1.x
+    options.ListenAnyIP(4999,
+        listenOptions =>
+            listenOptions.Protocols = HttpProtocols.Http1);
+
+    // Use HTTP/2
+    options.ListenAnyIP(
+        5000,
+        listenOptions =>
+            listenOptions.Protocols = HttpProtocols.Http2);
 
 
-        /// <summary>
-        /// Create and configure a builder object.
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => webBuilder.ConfigureKestrel(options =>
-                    {
-                        // Use HTTP/1.x
-                        options.ListenAnyIP(4999, listenOptions => 
-                            listenOptions.Protocols = HttpProtocols.Http1);
-                        
-                        // Use HTTP/2
-                        options.ListenAnyIP(5000, listenOptions => 
-                            listenOptions.Protocols = HttpProtocols.Http2);
-                        
-                        // Use HTTP/3
-                        options.ListenAnyIP(5001, listenOptions =>
-                        {
-                            listenOptions.Protocols = HttpProtocols.Http3;
-                            listenOptions.UseHttps();
-                        });
-                    })
-                    .UseStartup<Startup>());
-    }
-}
+    // options.ListenAnyIP(
+    //     5001,
+    //     listenOptions =>
+    //     {
+    //         // Enables HTTP/3
+    //         listenOptions.Protocols = HttpProtocols.Http3;
+    //
+    //         // Adds a TLS certificate to the endpoint
+    //         listenOptions.UseHttps(httpsOptions =>
+    //         {
+    //             httpsOptions.UseLettuceEncrypt(services);
+    //         });
+    //     });
+});
+//.ConfigureServices(services => services.AddLettuceEncrypt());
+
+await using var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+    app.UseDeveloperExceptionPage();
+
+// Register the Swagger generator, defining 1 or more Swagger documents
+app.UseSwagger();
+
+// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.)
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+    options.RoutePrefix = string.Empty; // Serve the Swagger UI at the app's root
+});
+
+// Matches request to an endpoint.
+app.UseRouting();
+
+// Execute the matched endpoint.
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    // Implements greet.v1.Greeter
+    endpoints.MapGrpcService<GreeterService>();
+});
+
+await app.RunAsync();
