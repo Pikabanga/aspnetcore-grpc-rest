@@ -96,12 +96,12 @@ builder.WebHost.UseKestrel(options =>
     //     listenOptions.UseHttps(httpsOptions =>
     //         httpsOptions.UseLettuceEncrypt(services));
     // });
-})
-.ConfigureServices(services => services.AddLettuceEncrypt());
+});
+//.ConfigureServices(services => services.AddLettuceEncrypt());
 
 await using var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 
