@@ -28,11 +28,20 @@ namespace aspnetapp
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => webBuilder.ConfigureKestrel(options =>
                     {
+                        // Use HTTP/1.x
                         options.ListenAnyIP(4999, listenOptions => 
                             listenOptions.Protocols = HttpProtocols.Http1);
-
+                        
+                        // Use HTTP/2
                         options.ListenAnyIP(5000, listenOptions => 
                             listenOptions.Protocols = HttpProtocols.Http2);
+                        
+                        // Use HTTP/3
+                        options.ListenAnyIP(5001, listenOptions =>
+                        {
+                            listenOptions.Protocols = HttpProtocols.Http3;
+                            listenOptions.UseHttps();
+                        });
                     })
                     .UseStartup<Startup>());
     }
