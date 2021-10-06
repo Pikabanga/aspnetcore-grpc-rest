@@ -39,6 +39,7 @@ builder.Services.AddVersionedApiExplorer(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
+// Register the Swagger generator, defining 1 or more Swagger documents
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -70,6 +71,7 @@ builder.Services.AddSwaggerGen(options =>
 // Registers the service with a scoped lifetime
 builder.Services.AddScoped<IGreeterService, GreeterService>();
 
+// Enables gRPC
 builder.Services.AddGrpc();
 
 builder.WebHost.UseKestrel(options =>
