@@ -48,7 +48,7 @@ namespace aspnetapp.Controllers
                 return BadRequest();
             
             // Forward the call to the greeter service
-            var response = await _service.SayHello(new HelloRequest {Name = name}, null);
+            var response = await _service.SayHello(new HelloRequest { Name = name }, null);
             return Ok(response);
         }
     }
