@@ -12,12 +12,12 @@ COPY aspnetapp/. ./aspnetapp/
 WORKDIR /app/aspnetapp
 RUN dotnet publish -c Release -o out
 
-# Build runtime image
+# build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/aspnetapp/out ./
 
-# Install libmsquic dependencies
+# install libmsquic dependencies
 RUN apt update \
     && apt install -y --no-install-recommends \
         curl \

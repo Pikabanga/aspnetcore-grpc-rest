@@ -29,7 +29,7 @@ namespace aspnetapp.Controllers
         }
 
         /// <summary>
-        /// A simple method to say hello
+        /// Sends a hello message and receives a hello reply
         /// </summary>
         /// <remarks>
         /// Sample request:

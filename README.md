@@ -15,7 +15,7 @@ You can import the code straight into your preferred IDE (i.e. Visual Studio) or
 >  dotnet .\aspnetapp\bin\Debug\net6.0\aspnetapp.dll
 ```
 
-After the application runs, navigate to http://localhost:4999/swagger in your web browser to access the Swagger UI. Enter a value in the name field and it should return something similar like this below:
+After the application runs, navigate to http://localhost:4999 in your web browser to access the Swagger UI. Enter a value in the name field and it should return something similar like this below:
 
 ```json
 {
@@ -36,7 +36,7 @@ You can build and run the sample in Docker using the following commands. Navigat
 >  docker run -it --rm -p 9000:4999 -p 9001:5000 --name aspnetcore-sample aspnetapp-k8s
 ```
 
-After the application starts, navigate to http://localhost:9000/swagger in your web browser.
+After the application starts, navigate to http://localhost:9000 in your web browser.
 
 > Note: The run command `-p` argument maps ports 9000 and 9001 on the local machine to ports 4999 and 5000 in the container (the form of the port mapping is `host:container`).
 
@@ -98,6 +98,6 @@ http://192.168.99.100:4999
 http://192.168.99.100:5000
 ```
 
-Navigate to http://192.168.99.100:4999/swagger in your web browser to test the REST component.
+Navigate to http://192.168.99.100:4999 in your web browser to test the REST component.
 
 And again for the gRPC piece, you can use a gRPC client (i.e. [BloomRPC](https://github.com/uw-labs/bloomrpc)) to connect to `192.168.99.100:5000`.
