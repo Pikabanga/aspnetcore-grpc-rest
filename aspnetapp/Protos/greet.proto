@@ -1,5 +1,5 @@
 syntax = "proto3";
-package greet.v1;
+package greet;
 
 // The greeting service definition.
 service Greeter {
